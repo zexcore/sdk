@@ -20,11 +20,11 @@ export async function initialize(
   _rtmOptions?: RTMClientOptions
 ) {
   options = _options;
-  rtmOptions = _rtmOptions;
+  rtmOptions = {
+    ...(_rtmOptions ? _rtmOptions : {}),
+    authenticationData: "api:" + _options.apiKey,
+  };
   client = createClient(_options.endpoint, _rtmOptions);
-  authentication = await client.authenticate<AuthenticationId>(
-    "api:" + _options.apiKey
-  );
   project = await getProject();
   return project;
 }
@@ -73,15 +73,42 @@ export async function logMessage(
  */
 export function hookWithConsole(tags?: string[]) {
   // Bind to console.
-  let _log = console.log.bind(console);
-  console.log = function (...args: any[]) {
+
+  let _info = console.info.bind(console);
+  console.info = function (...args: any[]) {
     // default &  console.log()
-    _log.apply(console, args);
+    _info.apply(console, args);
+    let _stack = "";
+    if (args.length > 1) {
+      for (let ag of args.slice(1)) {
+        _stack += ag;
+      }
+    }
     // Log on zexcore
     logMessage({
       kind: LogMessageKind.Information,
       message: args[0],
       tags: tags,
+      stack: Boolean(_stack) ? _stack : undefined,
+    });
+  };
+
+  let _log = console.log.bind(console);
+  console.log = function (...args: any[]) {
+    // default &  console.log()
+    _log.apply(console, args);
+    let _stack = "";
+    if (args.length > 1) {
+      for (let ag of args.slice(1)) {
+        _stack += ag;
+      }
+    }
+    // Log on zexcore
+    logMessage({
+      kind: LogMessageKind.Information,
+      message: args[0],
+      tags: tags,
+      stack: Boolean(_stack) ? _stack : undefined,
     });
   };
   // Bind to console.
@@ -89,11 +116,18 @@ export function hookWithConsole(tags?: string[]) {
   console.warn = function (...args: any[]) {
     // default &  console.log()
     _logW.apply(console, args);
+    let _stack = "";
+    if (args.length > 1) {
+      for (let ag of args.slice(1)) {
+        _stack += ag;
+      }
+    }
     // Log on zexcore
     logMessage({
       kind: LogMessageKind.Warning,
       message: args[0],
       tags: tags,
+      stack: Boolean(_stack) ? _stack : undefined,
     });
   };
   // Bind to console.
@@ -101,10 +135,17 @@ export function hookWithConsole(tags?: string[]) {
   console.error = function (...args: any[]) {
     // default &  console.log()
     _logE.apply(console, args);
+    let _stack = "";
+    if (args.length > 1) {
+      for (let ag of args.slice(1)) {
+        _stack += ag;
+      }
+    }
     // Log on zexcore
     logMessage({
       kind: LogMessageKind.Error,
       message: args[0],
+      stack: Boolean(_stack) ? _stack : undefined,
       tags: tags,
     });
   };
