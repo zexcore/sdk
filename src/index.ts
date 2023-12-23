@@ -78,7 +78,8 @@ export function hookWithConsole(tags?: string[]) {
   console.info = function (...args: any[]) {
     // default &  console.log()
     if (args[1] === false) {
-      _info.apply(console, args.splice(1, 1));
+      args.splice(1, 1);
+      _info.apply(console, args);
       return;
     }
     _info.apply(console, args);
@@ -101,7 +102,8 @@ export function hookWithConsole(tags?: string[]) {
   console.log = function (...args: any[]) {
     // default &  console.log()
     if (args[1] === false) {
-      _log.apply(console, args.splice(1, 1));
+      args.splice(1, 1);
+      _log.apply(console, args);
       return;
     }
     _log.apply(console, args);
@@ -124,7 +126,8 @@ export function hookWithConsole(tags?: string[]) {
   console.warn = function (...args: any[]) {
     // default &  console.log()
     if (args[1] === false) {
-      _logW.apply(console, args.splice(1, 1));
+      args.splice(1, 1);
+      _logW.apply(console, args);
       return;
     }
     _logW.apply(console, args);
@@ -147,7 +150,8 @@ export function hookWithConsole(tags?: string[]) {
   console.error = function (...args: any[]) {
     // default &  console.log()
     if (args[1] === false) {
-      _logE.apply(console, args.splice(1, 1));
+      args.splice(1, 1);
+      _logE.apply(console, args);
       return;
     }
     _logE.apply(console, args);
