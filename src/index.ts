@@ -78,6 +78,9 @@ export function hookWithConsole(tags?: string[]) {
   console.info = function (...args: any[]) {
     // default &  console.log()
     _info.apply(console, args);
+    if (args[args.length - 1] === false) {
+      return;
+    }
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
@@ -97,6 +100,9 @@ export function hookWithConsole(tags?: string[]) {
   console.log = function (...args: any[]) {
     // default &  console.log()
     _log.apply(console, args);
+    if (args[args.length - 1] === false) {
+      return;
+    }
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
@@ -116,6 +122,9 @@ export function hookWithConsole(tags?: string[]) {
   console.warn = function (...args: any[]) {
     // default &  console.log()
     _logW.apply(console, args);
+    if (args[args.length - 1] === false) {
+      return;
+    }
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
@@ -135,6 +144,9 @@ export function hookWithConsole(tags?: string[]) {
   console.error = function (...args: any[]) {
     // default &  console.log()
     _logE.apply(console, args);
+    if (args[args.length - 1] === false) {
+      return;
+    }
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
