@@ -24,7 +24,7 @@ export async function initialize(
     ...(_rtmOptions ? _rtmOptions : {}),
     authenticationData: "api:" + _options.apiKey,
   };
-  client = createClient(_options.endpoint, _rtmOptions);
+  client = createClient(_options.endpoint, rtmOptions);
   project = await getProject();
   return project;
 }
@@ -77,10 +77,11 @@ export function hookWithConsole(tags?: string[]) {
   let _info = console.info.bind(console);
   console.info = function (...args: any[]) {
     // default &  console.log()
-    _info.apply(console, args);
     if (args[args.length - 1] === false) {
+      _info.apply(console, args.splice(args.length - 1, 1));
       return;
     }
+    _info.apply(console, args);
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
@@ -99,10 +100,11 @@ export function hookWithConsole(tags?: string[]) {
   let _log = console.log.bind(console);
   console.log = function (...args: any[]) {
     // default &  console.log()
-    _log.apply(console, args);
     if (args[args.length - 1] === false) {
+      _log.apply(console, args.splice(args.length - 1, 1));
       return;
     }
+    _log.apply(console, args);
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
@@ -121,10 +123,11 @@ export function hookWithConsole(tags?: string[]) {
   let _logW = console.warn.bind(console);
   console.warn = function (...args: any[]) {
     // default &  console.log()
-    _logW.apply(console, args);
     if (args[args.length - 1] === false) {
+      _logW.apply(console, args.splice(args.length - 1, 1));
       return;
     }
+    _logW.apply(console, args);
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
@@ -143,10 +146,11 @@ export function hookWithConsole(tags?: string[]) {
   let _logE = console.error.bind(console);
   console.error = function (...args: any[]) {
     // default &  console.log()
-    _logE.apply(console, args);
     if (args[args.length - 1] === false) {
+      _logE.apply(console, args.splice(args.length - 1, 1));
       return;
     }
+    _logE.apply(console, args);
     let _stack = "";
     if (args.length > 1) {
       for (let ag of args.slice(1)) {
