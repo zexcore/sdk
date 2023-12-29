@@ -1,4 +1,4 @@
-import { RTMClient, createClient } from "@zexcore/rtm-client";
+import { RtmClient } from "@zexcore/rtm-client";
 import { ZexcoreOptions } from "./models/options";
 import { RTMClientOptions } from "@zexcore/rtm-client/dist/RTMClientOptions";
 import { AuthenticationId } from "./models/AuthenticationId";
@@ -6,7 +6,7 @@ import { Project } from "./models/Project";
 import { LogMessage } from "./models/LogMessage";
 import { LogMessageKind } from "./models/LogMessageKind";
 
-let client: RTMClient;
+let client: RtmClient;
 let authentication: AuthenticationId | undefined = undefined;
 let options: ZexcoreOptions | undefined;
 let rtmOptions: RTMClientOptions | undefined;
@@ -24,7 +24,7 @@ export async function initialize(
     ...(_rtmOptions ? _rtmOptions : {}),
     authenticationData: "api:" + _options.apiKey,
   };
-  client = createClient(_options.endpoint, rtmOptions);
+  client = new RtmClient(_options.endpoint, rtmOptions);
   project = await getProject();
   return project;
 }
@@ -43,9 +43,9 @@ export function getAuthenticationId() {
 export async function getProject() {
   if (!options?.projectId) throw new Error("Project ID is not set. ");
   if (!client) throw new Error("Please initialize the client first. ");
-  if (!client.isAuthenticated)
+  if (!client.Authenticated)
     throw new Error("Please authenticate using API key first. ");
-  const proj = await client.callWait<Project>(
+  const proj = await client.CallWait<Project>(
     "libGetProject",
     options?.projectId
   );
@@ -61,7 +61,7 @@ export async function logMessage(
   msg: Omit<Partial<LogMessage>, "project" | "created">
 ) {
   if (!msg.kind) msg.kind = LogMessageKind.Information;
-  await client.call("libLogMessage", {
+  await client.Call("libLogMessage", {
     ...msg,
     project: project!.id,
     created: new Date().getTime(),

@@ -1,6 +1,6 @@
 {
   "name": "@zexcore/sdk",
-  "version": "1.0.24",
+  "version": "2.1.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +17,6 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@zexcore/rtm-client": "^1.0.2"
+    "@zexcore/rtm-client": "^2.1.0"
   }
 }
