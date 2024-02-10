@@ -2,31 +2,33 @@ import { RtmClient } from "@zexcore/rtm-client";
 import { ZexcoreOptions } from "./models/options";
 import { RTMClientOptions } from "@zexcore/rtm-client/dist/RTMClientOptions";
 import { AuthenticationId } from "./models/AuthenticationId";
-import { Project } from "./models/Project";
-import { LogMessage } from "./models/LogMessage";
-import { LogMessageKind } from "./models/LogMessageKind";
+import { Event, LogMessage, LogMessageKind, Project } from "@zexcore/types";
 
 let client: RtmClient;
 let authentication: AuthenticationId | undefined = undefined;
 let options: ZexcoreOptions | undefined;
 let rtmOptions: RTMClientOptions | undefined;
-let project: Project | undefined;
 
 /**
- * Initializes the zexcore and RTM client API for logging.
+ * Initializes the zexcore and RTM client API for logging. Returns only after project is loaded.
  */
 export async function initialize(
   _options: ZexcoreOptions,
   _rtmOptions?: RTMClientOptions
 ) {
-  options = _options;
-  rtmOptions = {
-    ...(_rtmOptions ? _rtmOptions : {}),
-    authenticationData: "api:" + _options.apiKey,
-  };
-  client = new RtmClient(_options.endpoint, rtmOptions);
-  project = await getProject();
-  return project;
+  return new Promise((resolve) => {
+    options = _options;
+    rtmOptions = {
+      ...(_rtmOptions ? _rtmOptions : {}),
+      authenticationData: "api:" + _options.apiKey,
+      async onOpen() {
+        _rtmOptions?.onOpen?.();
+        const proj = await getProject();
+        resolve(proj);
+      },
+    };
+    client = new RtmClient(_options.endpoint, rtmOptions);
+  });
 }
 
 /**
@@ -63,8 +65,21 @@ export async function logMessage(
   if (!msg.kind) msg.kind = LogMessageKind.Information;
   await client.Call("libLogMessage", {
     ...msg,
-    project: project!.id,
+    project: options?.projectId!,
     created: new Date().getTime(),
+  });
+}
+
+/**
+ * Sends the specified log message.
+ * @param msg
+ */
+export async function logEvent(
+  msg: Omit<Partial<Event>, "id" | "project" | "timestamp">
+) {
+  await client.Call("libLogEvent", {
+    ...msg,
+    project: options?.projectId!,
   });
 }
 
@@ -73,7 +88,6 @@ export async function logMessage(
  */
 export function hookWithConsole(tags?: string[]) {
   // Bind to console.
-
   let _info = console.info.bind(console);
   console.info = function (...args: any[]) {
     // default &  console.log()
