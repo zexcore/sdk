@@ -16,7 +16,7 @@ export async function initialize(
   _options: ZexcoreOptions,
   _rtmOptions?: RTMClientOptions
 ) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     options = _options;
     rtmOptions = {
       ...(_rtmOptions ? _rtmOptions : {}),
@@ -27,7 +27,11 @@ export async function initialize(
         resolve(proj);
       },
     };
-    client = new RtmClient(_options.endpoint, rtmOptions);
+    try {
+      client = new RtmClient(_options.endpoint, rtmOptions);
+    } catch (err: any) {
+      reject(err);
+    }
   });
 }
 
@@ -62,12 +66,14 @@ export async function getProject() {
 export async function logMessage(
   msg: Omit<Partial<LogMessage>, "project" | "created">
 ) {
-  if (!msg.kind) msg.kind = LogMessageKind.Information;
-  await client.Call("libLogMessage", {
-    ...msg,
-    project: options?.projectId!,
-    created: new Date().getTime(),
-  });
+  try {
+    if (!msg.kind) msg.kind = LogMessageKind.Information;
+    await client.Call("libLogMessage", {
+      ...msg,
+      project: options?.projectId!,
+      created: new Date().getTime(),
+    });
+  } catch (err: any) {}
 }
 
 /**
@@ -77,10 +83,12 @@ export async function logMessage(
 export async function logEvent(
   msg: Omit<Partial<Event>, "id" | "project" | "timestamp">
 ) {
-  await client.Call("libLogEvent", {
-    ...msg,
-    project: options?.projectId!,
-  });
+  try {
+    await client.Call("libLogEvent", {
+      ...msg,
+      project: options?.projectId!,
+    });
+  } catch (err: any) {}
 }
 
 /**
